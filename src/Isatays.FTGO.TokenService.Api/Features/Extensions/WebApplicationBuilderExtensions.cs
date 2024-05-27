@@ -74,6 +74,25 @@ public static class WebApplicationBuilderExtensions
         _ = builder.Services.ConfigureDependencyInjection();
 
         #endregion Project Dependencies
+        
+        #region Authentification
+        
+        builder.Services.AddAuthentication("Bearer")
+            .AddJwtBearer("Bearer", options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes("f2a1ed52710d4533bde25be6da03b6e3"))
+                };
+            });
+        
+        builder.Services.AddAuthorization();
+        
+        #endregion Authentification
 
         return builder;
     }
