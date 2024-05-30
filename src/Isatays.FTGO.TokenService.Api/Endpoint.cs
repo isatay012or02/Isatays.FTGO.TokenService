@@ -3,6 +3,9 @@ using System.Security.Claims;
 using System.Text;
 using Isatays.FTGO.TokenService.Api.Common.Errors;
 using Isatays.FTGO.TokenService.Api.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Isatays.FTGO.TokenService.Api;
 
@@ -10,7 +13,7 @@ public static class Endpoint
 {
     public static void ConfigureAccountEndpoints(this WebApplication app)
     {
-        app.MapGet("api/v1", GetToken)
+        app.MapPost("api/v1", CreateToken)
             .WithGroupName("Token")
             .Produces<string>(StatusCodes.Status200OK, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status400BadRequest, contentType: MediaTypeNames.Application.Json)
@@ -18,7 +21,7 @@ public static class Endpoint
             .Produces<ApiError>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
     }
     
-    private static async Task<IResult> GetToken(Service service, IConfiguration configuration, GetTokenDto request)
+    private static async Task<IResult> CreateToken(IService service, IConfiguration configuration, [FromBody] GetTokenDto request)
     {
         var roleCode = await service.GetRoleCodeByCheckUser(request.UserName, request.Password);
         if (roleCode.IsFailed)
@@ -29,13 +32,13 @@ public static class Endpoint
         var tokenHandler = new JwtSecurityTokenHandler();
         var secretKey = configuration["AuthOptions:SecretKey"];
         var key = Encoding.ASCII.GetBytes(secretKey);
-        var tokenLifeExpiration = int.Parse(_configuration["AuthOptions:TokenLifeExpirationInHour"]);
+        var tokenLifeExpiration = int.Parse(configuration["AuthOptions:TokenLifeExpirationInHour"]);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-                new Claim(ClaimTypes.Name, request.UserName),
-                new Claim(ClaimTypes.Role, configuration["AuthOptions:RoleCode"])
+                new(ClaimTypes.Name, request.UserName),
+                new(ClaimTypes.Role, configuration["AuthOptions:RoleCode"])
             }),
             // Время жизни токена
             Expires = DateTime.UtcNow.AddHours(tokenLifeExpiration),

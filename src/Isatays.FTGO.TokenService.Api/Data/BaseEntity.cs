@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Isatays.FTGO.TokenService.Api.Data;
 
-public class BaseEntity
+public abstract class BaseEntity
 {
     [Key]
     [Column(name:"id")]

@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
     
     public static IServiceCollection ConfigureDependencyInjection(this IServiceCollection services)
     {
-        services.AddScoped<Service>();
+        services.AddScoped<IService, Service>();
 
         return services;
     }

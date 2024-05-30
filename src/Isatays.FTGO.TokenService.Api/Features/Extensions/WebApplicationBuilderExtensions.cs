@@ -1,9 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -55,7 +58,7 @@ public static class WebApplicationBuilderExtensions
             {
                 Version = "V1",
                 Title = $"{ti.ToTitleCase(builder.Environment.EnvironmentName)} API",
-                Description = "An API to show an implementation of AccountService.",
+                Description = "An API to show an implementation of TokenService.",
                 Contact = new OpenApiContact
                 {
                     Name = "Isatay Abdrakhmanov",
@@ -64,6 +67,33 @@ public static class WebApplicationBuilderExtensions
             });
             c.TagActionsBy(api => new[] { api.GroupName });
             c.DocInclusionPredicate((name, api) => true);
+            
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header,
+                    },
+                    new List<string>()
+                }
+            });
         });
 
         #endregion Swagger
@@ -77,7 +107,7 @@ public static class WebApplicationBuilderExtensions
         
         #region Authentification
         
-        builder.Services.AddAuthentication("Bearer")
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Bearer", options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
