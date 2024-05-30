@@ -8,9 +8,7 @@ try
     var app = WebApplication.CreateBuilder(args).ConfigureBuilder().Build().ConfigureApp();
 
     app.UseMiddleware<LoggingMiddleware>();
-    app.UseMiddleware<ExceptionHandleMiddleware>();
-
-    //app.MapHealthChecks("/healthcheck");
+    app.UseMiddleware<ExceptionHandleMiddleware>(); ;
 
     app.ConfigureAccountEndpoints();
 

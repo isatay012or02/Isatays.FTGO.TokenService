@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Isatays.FTGO.TokenService.Api;
 
-public class Service(ILogger<Service> logger, TokenContext context) : IService
+public class Service(ILogger<Service> logger, TokenContext context)
 {
     public async Task<Result<string>> GetRoleCodeByCheckUser(string userName, string password)
     {

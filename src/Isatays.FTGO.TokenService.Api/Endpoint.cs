@@ -19,9 +19,14 @@ public static class Endpoint
             .Produces<ApiError>(StatusCodes.Status400BadRequest, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status404NotFound, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
+        
+        app.MapGet("health", () => Results.Ok("Healthy"))
+            .WithGroupName("Health")
+            .Produces<string>(StatusCodes.Status200OK, contentType: MediaTypeNames.Application.Json)
+            .Produces<string>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);;
     }
     
-    private static async Task<IResult> CreateToken(IService service, IConfiguration configuration, [FromBody] GetTokenDto request)
+    private static async Task<IResult> CreateToken(Service service, IConfiguration configuration, [FromBody] GetTokenDto request)
     {
         var roleCode = await service.GetRoleCodeByCheckUser(request.UserName, request.Password);
         if (roleCode.IsFailed)
