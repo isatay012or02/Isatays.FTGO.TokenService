@@ -5,12 +5,12 @@ using Serilog;
 
 try
 {
-    var app = WebApplication.CreateBuilder(args).ConfigureBuilder().Build().ConfigureApp();
+    var app = WebApplication.CreateBuilder().ConfigureBuilder().Build().ConfigureApp();
 
     app.UseMiddleware<LoggingMiddleware>();
     app.UseMiddleware<ExceptionHandleMiddleware>(); ;
 
-    app.ConfigureAccountEndpoints();
+    app.ConfigureTokenEndpoints();
 
     app.Run();
 }
