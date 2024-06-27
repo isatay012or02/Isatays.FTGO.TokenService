@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Isatays.FTGO.TokenService.Api;
 
+/// <summary>
+/// 
+/// </summary>
 public class Service(ILogger<Service> logger, TokenContext context)
 {
     public async Task<Result<string>> GetRoleCodeByCheckUser(string userName, string password)
@@ -28,12 +31,12 @@ public class Service(ILogger<Service> logger, TokenContext context)
         }
         catch (DatabaseException ex)
         {
-            logger.LogError($"Ошибка на уровне базы данных. Описание: {ex.Message}");
+            logger.LogError("Ошибка на уровне базы данных. Описание: {Message}", ex.Message);
             return Result.Failure<string>(DomainError.DatabaseFailed);
         }
         catch (Exception ex)
         {
-            logger.LogError($"Ошибка при обращений на базу данных. Описание ошибки: {ex.Message}");
+            logger.LogError("Ошибка при обращений на базу данных. Описание ошибки: {Message}", ex.Message);
             return Result.Failure<string>(DomainError.DatabaseFailed);
         }
 

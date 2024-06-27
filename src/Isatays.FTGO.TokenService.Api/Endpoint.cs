@@ -4,6 +4,8 @@ using System.Text;
 using Isatays.FTGO.TokenService.Api.Common.Errors;
 using Isatays.FTGO.TokenService.Api.Models;
 using System.IdentityModel.Tokens.Jwt;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,11 +27,12 @@ public static class Endpoint
             .Produces<ApiError>(StatusCodes.Status400BadRequest, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status404NotFound, contentType: MediaTypeNames.Application.Json)
             .Produces<ApiError>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
-        
-        app.MapGet("health", () => Results.Ok("Healthy"))
-            .WithGroupName("Health")
-            .Produces<string>(StatusCodes.Status200OK, contentType: MediaTypeNames.Application.Json)
-            .Produces<string>(StatusCodes.Status500InternalServerError, contentType: MediaTypeNames.Application.Json);
+
+        app.MapHealthChecks("health", new HealthCheckOptions
+            {
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            })
+            .WithGroupName("Health");
     }
     
     private static async Task<IResult> CreateToken(Service service, IConfiguration configuration, [FromBody] GetTokenDto request)
