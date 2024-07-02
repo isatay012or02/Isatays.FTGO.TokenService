@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Isatays.FTGO.TokenService.Api.Data;
 
-public class TokenContext(DbContextOptions<TokenContext> options) : DbContext(options)
+public class Context(DbContextOptions<Context> options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
     

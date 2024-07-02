@@ -1,6 +1,7 @@
 using Isatays.FTGO.TokenService.Api.Common.Errors;
 using Isatays.FTGO.TokenService.Api.Common.Exceptions;
 using Isatays.FTGO.TokenService.Api.Data;
+using Issatays.Ftgo.Logger;
 using KDS.Primitives.FluentResult;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +10,14 @@ namespace Isatays.FTGO.TokenService.Api;
 /// <summary>
 /// 
 /// </summary>
-public class Service(ILogger<Service> logger, TokenContext context)
+public class Service(ILoggerService<Service> logger, Context context)
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <param name="password"></param>
+    /// <returns></returns>
     public async Task<Result<string>> GetRoleCodeByCheckUser(string userName, string password)
     {
         string? roleCode;
@@ -23,23 +30,26 @@ public class Service(ILogger<Service> logger, TokenContext context)
                     role => role.Id,
                     (user, role) => role.Code)
                 .FirstOrDefaultAsync();
-            if (roleCode == string.Empty)
+            if (roleCode is null or "")
             {
-                logger.LogError($"Не удалось получить данные по запросу.");
+                logger.LogError(nameof(GetRoleCodeByCheckUser), -45367, "Data's not found",
+                    "Data's not found from the database by the requests", new { userName }, null!);
                 return Result.Failure<string>(DomainError.NotFound);
             }
         }
         catch (DatabaseException ex)
         {
-            logger.LogError("Ошибка на уровне базы данных. Описание: {Message}", ex.Message);
+            logger.LogError(nameof(GetRoleCodeByCheckUser), -45368, ex.Message,
+                "Error's on the database level", new { userName }, null!);
             return Result.Failure<string>(DomainError.DatabaseFailed);
         }
         catch (Exception ex)
         {
-            logger.LogError("Ошибка при обращений на базу данных. Описание ошибки: {Message}", ex.Message);
+            logger.LogError(nameof(GetRoleCodeByCheckUser), -45369, ex.Message,
+                "Error's on the total level", new { userName }, null!);
             return Result.Failure<string>(DomainError.DatabaseFailed);
         }
 
-        return Result.Success(roleCode!);
+        return Result.Success(roleCode);
     }
 }

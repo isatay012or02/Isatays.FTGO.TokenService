@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     {
         var connectionString = configuration.GetConnectionString("Ftgo")!;
 
-        services.AddDbContext<TokenContext>(options =>
+        services.AddDbContext<Context>(options =>
         {
             options.UseNpgsql(connectionString,
                 sqlOptions =>
